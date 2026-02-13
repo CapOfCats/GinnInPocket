@@ -1,8 +1,8 @@
-```markdown
+
 🎯 GinnInPocket
 *Your personal goal-oriented accumulation companion*
 
----
+--------
 
 ## 🧠 Core Idea
 
@@ -32,7 +32,7 @@ Whether you're saving for:
 - 🏠 **A down payment**
 - 🎸 **A new instrument**
 - 👟 **Priority purchases** (like new underwear over new shoes!)
-```
+
 
 ## 🔧 **How It Works (Concept)**
 
