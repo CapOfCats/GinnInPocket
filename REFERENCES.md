@@ -125,11 +125,11 @@ Qapital автоматизирует накопления через систе�
 Выбор n8n как основы технического стека GinnInPocket имеет весомое обоснование — сообщество уже создаёт аналогичные финансовые ассистенты:
 
 - **AI-powered Personal Finances Manager** (n8n + Gemini + Telegram + Google Sheets) — логирование доходов и расходов через Telegram, AI-категоризация и аналитика.
-- https://n8n.io/workflows/7411-ai-powered-personal-finances-manager-with-gemini-telegram-and-google-sheets/
+https://n8n.io/workflows/7411-ai-powered-personal-finances-manager-with-gemini-telegram-and-google-sheets/
 - **Financial AI Agent** (n8n + LangChain + GPT-4.1 + Supabase) — запись транзакций, категоризация, персонализированные советы, работа через Telegram и WhatsApp.
-- https://n8n.io/workflows/5259-financial-ai-agent-telegram-and-whatsapp/ 
+https://n8n.io/workflows/5259-financial-ai-agent-telegram-and-whatsapp/ 
 - **AI Finance Tracker** (n8n + Telegram + MongoDB) — отслеживание расходов по текстовым сообщениям, еженедельные отчёты в XLSX, базовые инсайты по привычкам.
-- https://www.reddit.com/r/n8n/comments/1r4eycg/built_an_aipowered_personal_finance_tracker_in/
+https://www.reddit.com/r/n8n/comments/1r4eycg/built_an_aipowered_personal_finance_tracker_in/
 
 Все эти решения сосредоточены на **трекинге** (учёте транзакций), тогда как GinnInPocket предлагает принципиально другую парадигму — **целеориентированное планирование** с декомпозицией и внешними данными.
 
@@ -140,9 +140,9 @@ Qapital автоматизирует накопления через систе�
 Одна из уникальных запланированных функций GinnInPocket — подключение к торговым платформам для получения реальных цен. В экосистеме сервисов сравнения цен существуют зрелые решения:
 
 - **CompareCart** отслеживает цены на 43 платформах с обновлением за 30–45 секунд, рассчитывает полную стоимость (товар + доставка + налоги) и прогнозирует будущие цены с помощью ML.
-- https://dev.to/pranavjana/comparecart-real-time-e-commerce-price-comparison-across-major-platforms-4d3p
+https://dev.to/pranavjana/comparecart-real-time-e-commerce-price-comparison-across-major-platforms-4d3p
 - **PriceSpy** мониторит сотни тысяч товаров и предоставляет историю цен для оценки оптимального момента покупки.
-- http://oreateai.com/blog/unlocking-savings-the-best-price-comparison-apps-for-smart-shoppers/fc283ac4f8d87a580728a3abf3b9cb83
+http://oreateai.com/blog/unlocking-savings-the-best-price-comparison-apps-for-smart-shoppers/fc283ac4f8d87a580728a3abf3b9cb83
 
 Интеграция подобной функциональности в финансовый AI-советник пока не реализована ни одним из рассмотренных конкурентов — это потенциальное конкурентное преимущество GinnInPocket.
 
