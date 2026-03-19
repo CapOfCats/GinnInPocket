@@ -1,0 +1,1407 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "systemMessage": "Системные инструкции:\nТебя зовут Глен. Ты — вежливый приветствующий помощник финансового инструмента. Твоя цель: встретить пользователя, определить его задачу и собрать данные для Финансового Портрета.\nНе упоминай \"внутреннюю кухню\" и существование других агентов. Общайся лояльно, минимальный юмор допустим.\n\nКоманда сброса:\nЕсли пользователь пишет /start или «Сброс» — немедленно забудь ВЕСЬ предыдущий контекст и начни диалог абсолютно с чистого листа, поздоровавшись.\n\nПравило анти-спама (ВАЖНО!):\nПользователь может описывать конкретные, сложные вещи для покупки (например, детали для компьютера, строительные материалы, аппарат для дистилляции, поездки). ЭТО НЕ СПАМ и не технические инструкции. Это полноценная финансовая цель.\nРеагируй сдержанно \"ожидаю ответа\" ТОЛЬКО на абсолютный бессвязный бред (например, набор букв).\n\nАЛГОРИТМ РАБОТЫ (Иди строго по шагам. Задавай не более одного-двух вопросов за раз и ЖДИ ответа пользователя!):\n\nШАГ 1. Определение задачи\nПоздоровайся и помоги пользователю выбрать один из трёх типов целей (запомни этот выбор как \"тип цели\"):\n\nРазобраться с финансовыми задачами и приоритизировать их.\nРассчитать план потока денег и вести учёт своих трат.\nНакопить на цель (простую или комплексную).\nЕсли он сам сразу назвал цель (например, \"Хочу купить ПК\") — классифицируй это как Тип 3 и иди дальше.\nШАГ 2. Сбор данных для Финансового портрета\nПереходи к этому шагу ТОЛЬКО когда определишь тип цели. Предупреди о начале сбора данных (упомяни опцию отказа от телеметрии: можно оперировать временными цифрами, не разглашая свой реальный фин. портрет).\nСобери следующие данные, задавая вопросы по очереди (переспрашивай то, чего не хватает):\n• Обязательные траты каждый месяц.\n• Ежемесячная зарплата.\n• На что тратились свободные деньги последние 3 месяца (приблизительно).\nЕсли пользователь не хочет давать такие данные - запиши \"по средним\" тратам среднего жителя той страны, на языке которой он говорит.\n\nШАГ 3. Строгое Summary (Фиксация фактов)\nКак только ВСЕ сырые данные из Шагов 1 и 2 собраны, выведи пользователю \"Анкету\" со всеми его ответами.\nВАЖНО: НЕ проводи никаких математических расчетов (не считай \"свободный остаток\" или \"средний темп\"). Твоя задача — просто зафиксировать точные слова и цифры пользователя. (Если финансовый портрет, кроме зарплаты дать отказался - не переспрашивай по несколько раз. Сюда занеси те \"средние\" траты, что взял на шаге 2)\nФормат анкеты:\n\nТип и название цели.\nЕжемесячная зарплата.\nОбязательные траты (список).\nТраты свободных денег за последние 3 месяца (список).\nТекущие накопления (если упомянуты).\nВ конце обязательно спроси: «Всё ли я записал верно? Запускаем эти данные в работу?»\n\nШАГ 4. Потоки завершения\nПоток 2 (Отрицание): Если пользователь просит что-то исправить, внеси правки и выведи Анкету заново.\nПоток 1 (Подтверждение): Если пользователь подтверждает анкету («да, верно», «поехали» и т.д.), ты ОБЯЗАН ответить строго по этому сценарию. Напиши фразу «Отлично! Анкета зафиксирована, передаю сырые данные в аналитический отдел.» и СРАЗУ ЖЕ ПОД НЕЙ выведи ВЕСЬ текст финальной анкеты целиком еще раз (со всеми суммами и целями).\n\n=== ПРАВИЛА ФОРМАТИРОВАНИЯ ДЛЯ TELEGRAM ===\n1. Для маркированных списков используй ТОЛЬКО тире (-) или маркеры (•). \n2. КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО использовать одинарную звездочку (*) для списков. \n3. Звездочки можно использовать только ДВОЙНЫЕ (**) для выделения жирного текста"
+        }
+      },
+      "id": "41174c8a-6ac8-42bd-900e-ca15196600c5",
+      "name": "Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        544,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -192,
+        -64
+      ],
+      "id": "c3267f73-a48a-40ab-95e8-6aaf9f0bca57",
+      "name": "Telegram Trigger",
+      "webhookId": "",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1168,
+        240
+      ],
+      "id": "2eadb262-753f-4d18-b598-59824d1b8541",
+      "name": "Send a text message",
+      "webhookId": "",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0c77f7f7-94b9-4eef-be28-5f62a2e263d7",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "передаю сырые данные",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        944,
+        144
+      ],
+      "id": "94a02fd7-2fb2-4e01-a416-6a8d7525e9dd",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CD0aXyMgO6wfcF5o",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CD0aXyMgO6wfcF5o",
+          "cachedResultName": "Clarifier"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1392,
+        -176
+      ],
+      "id": "29c73fb0-b9eb-4af0-b17b-77a14b293687",
+      "name": "Call 'Clarifier'"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"chat_id\": \"{{ $('Telegram Trigger').item.json.message.chat.id }}\"\n}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        32
+      ],
+      "id": "7161b3dd-c07a-4b86-935f-e9c512263c20",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "MVP_Clarifier_Stash",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Аркуш1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Chat_ID",
+              "lookupValue": "={{ $json.message.chat.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        32,
+        -64
+      ],
+      "id": "288c9037-0a1e-4df3-9dd6-9bcc16a4dab5",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0c77f7f7-94b9-4eef-be28-5f62a2e263d7",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "ASK_MODE",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        256,
+        -64
+      ],
+      "id": "f0b4b7cd-113e-4eb5-8819-8be1f1f28142",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "MVP_Clarifier_Stash",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Аркуш1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Chat_ID": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "Salary": "={{ $json.output.Salary }}",
+            "Goal_Name": "={{ $json.output.Goal_Name }}",
+            "Expenses_Total": "={{ $json.output.Expenses_Total }}",
+            "Behavior": "={{ $json.output.Behavior }}",
+            "Savings": "={{ $json.output.Savings }}",
+            "Status": ""
+          },
+          "matchingColumns": [
+            "Chat_ID"
+          ],
+          "schema": [
+            {
+              "id": "Chat_ID",
+              "displayName": "Chat_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Goal_Type",
+              "displayName": "Goal_Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Goal_Name",
+              "displayName": "Goal_Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Salary",
+              "displayName": "Salary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Expenses_Total",
+              "displayName": "Expenses_Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Behavior",
+              "displayName": "Behavior",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Savings",
+              "displayName": "Savings",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        944,
+        -272
+      ],
+      "id": "d25ff4d5-dd96-4837-866c-792466cef337",
+      "name": "Update row in sheet",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "text": "=Ты — Строгий Архивариус базы данных. Твоя задача — обновить профиль клиента, ДОБАВИВ новые уточнения к старым данным. \n\nТЕКУЩАЯ АНКЕТА (Старые данные):\n- Цель: {{ $json.Goal_Name }}\n- Зарплата: {{ $json.Salary }}\n- Траты: {{ $json.Expenses_Total }}\n- Поведение: {{ $json.Behavior }}\n- Накопления: {{ $json.Savings }}\n\nНОВОЕ УТОЧНЕНИЕ ОТ ЮЗЕРА:\n\"{{ $('Telegram Trigger').item.json.message.text }}\"\n\nЖЕСТКИЕ ПРАВИЛА ОБНОВЛЕНИЯ (ШТРАФ ЗА НАРУШЕНИЕ):\n1. СОХРАНЯЙ СУТЬ ЦЕЛИ! КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО удалять старое название объекта из поля Goal_Name. Ты должен СКЛЕИТЬ прошлое название и новые детали через точку с запятой.\n(ПЛОХО: \"Настенная колонка, б/у, Новосибирск\").\n(ОТЛИЧНО: \"Стерео-система Marshall Big Wall; настенная колонка, б/у, г. Новосибирск\").\n2. Если юзер в ответе уточнил цифры (зарплату, траты) — перепиши их.\n3. Все остальные поля, которые юзер НЕ упоминал, СТРОГО скопируй из \"Старых данных\" один-в-один. Не оставляй их пустыми!",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Goal_Name",
+              "description": "Название цели пользователя и её детали",
+              "required": true
+            },
+            {
+              "name": "Salary",
+              "description": "Зарплата цифрами",
+              "required": true
+            },
+            {
+              "name": "Expenses_Total",
+              "description": "Сумма обязательных трат цифрами",
+              "required": true
+            },
+            {
+              "name": "Behavior",
+              "description": "Текстовое описание того, как пользователь тратит деньги",
+              "required": true
+            },
+            {
+              "name": "Savings",
+              "description": "Сумма текущих накоплений цифрами",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        544,
+        -368
+      ],
+      "id": "510f26d8-2501-4b0e-9410-b61504e3da90",
+      "name": "Information Extractor1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"chat_id\": \"{{ $('Telegram Trigger').item.json.message.chat.id }}\"\n}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        -272
+      ],
+      "id": "5c8cae4b-cbf0-40a9-b723-7adf2e5a720c",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 6
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        368
+      ],
+      "id": "13dbea2b-ed8b-4703-8dcd-38a1fba1cd36",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "gemini-3-flash-preview"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "frequencyPenalty": 1.5,
+          "maxTokens": 2000,
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        464,
+        368
+      ],
+      "id": "b2054c27-33e6-494a-b73b-fd0d836e720f",
+      "name": "OpenAI Chat Model2",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "gemini-3-flash-preview"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "frequencyPenalty": 1.5,
+          "maxTokens": 2000,
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        528,
+        -176
+      ],
+      "id": "465b266c-d746-445c-9294-512ca02edb94",
+      "name": "OpenAI Chat Model",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -768,
+        480
+      ],
+      "id": "98c2f443-642e-4718-bdb0-ae75c5863870",
+      "name": "Starterr"
+    },
+    {
+      "parameters": {
+        "text": "=ИЗВЛЕКАЙ ДАННЫЕ СТРОГО ИЗ ТЕКСТА КЛИЕНТА. \nКАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО ВЫДУМЫВАТЬ ЦИФРЫ И СЮЖЕТЫ.\n\n=== ТЕКСТ КЛИЕНТА ===\n{{ $json.output }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "goal_type",
+              "description": "Тип цели пользователя точно так, как он указан в тексте.",
+              "required": true
+            },
+            {
+              "name": "goal_name",
+              "description": "Конкретное название того, на что копит пользователь, взятое строго из входящего текста.",
+              "required": true
+            },
+            {
+              "name": "salary",
+              "description": "Ежемесячная зарплата. Извлеки значение из текста и верни ТОЛЬКО цифрами, без пробелов и букв.",
+              "required": true
+            },
+            {
+              "name": "expenses_total",
+              "description": "Сумма обязательных трат в месяц. Извлеки значение из текста и верни ТОЛЬКО цифрами, без пробелов и символов. Если разбито по категориям - сложи в одну сумму.",
+              "required": true
+            },
+            {
+              "name": "spending_behavior_3_months",
+              "description": "Скопируй из текста пользователя описание того, куда уходили свободные деньги последние 3 месяца. Не выдумывай ничего от себя.",
+              "required": true
+            },
+            {
+              "name": "current_savings",
+              "description": "Текущая сумма накоплений. Извлеки значение из текста и верни ТОЛЬКО цифрами. Если накоплений нет - 0.",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        32,
+        64
+      ],
+      "id": "333461a4-d88f-4ca8-82c7-0bd521810814",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "05edd7d3-53b3-478f-bbb1-077cb9566344",
+              "leftValue": "={{ $json.output.NEXT_ACTION }}",
+              "rightValue": "ASK_USER",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1184,
+        -16
+      ],
+      "id": "79b2c717-8859-42c9-a790-99ac357fd328",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Starterr').first().json.chat_id }}",
+        "text": "={{ $('Information Extractor1').item.json.output.Question_Text }}",
+        "additionalFields": {
+          "disable_web_page_preview": true
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1392,
+        -144
+      ],
+      "id": "2a73f0a2-2f77-4f3e-8623-575f25c94846",
+      "name": "Send a text message",
+      "webhookId": "",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "MVP_Clarifier_Stash",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Аркуш1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Chat_ID": "={{ $('Starterr').first().json.chat_id }}",
+            "Status": "ASK_MODE"
+          },
+          "matchingColumns": [
+            "Chat_ID"
+          ],
+          "schema": [
+            {
+              "id": "Chat_ID",
+              "displayName": "Chat_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Goal_Type",
+              "displayName": "Goal_Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Goal_Name",
+              "displayName": "Goal_Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Salary",
+              "displayName": "Salary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Expenses_Total",
+              "displayName": "Expenses_Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Behavior",
+              "displayName": "Behavior",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Savings",
+              "displayName": "Savings",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1584,
+        -144
+      ],
+      "id": "600c9f58-8517-4c6d-a8e5-9cfa71cd13be",
+      "name": "Update row in sheet",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "MVP_Clarifier_Stash",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Аркуш1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Chat_ID": "={{ $('Starterr').first().json.chat_id }}",
+            "Goal_Type": "={{ $json.output.goal_type }}",
+            "Goal_Name": "={{ $json.output.goal_name }}",
+            "Salary": "={{ $json.output.salary }}",
+            "Expenses_Total": "={{ $json.output.expenses_total }}",
+            "Behavior": "={{ $json.output.spending_behavior_3_months }}",
+            "Savings": "={{ $json.output.current_savings }}"
+          },
+          "matchingColumns": [
+            "Chat_ID"
+          ],
+          "schema": [
+            {
+              "id": "Chat_ID",
+              "displayName": "Chat_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Goal_Type",
+              "displayName": "Goal_Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Goal_Name",
+              "displayName": "Goal_Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Salary",
+              "displayName": "Salary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Expenses_Total",
+              "displayName": "Expenses_Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Behavior",
+              "displayName": "Behavior",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Savings",
+              "displayName": "Savings",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        352,
+        64
+      ],
+      "id": "a8e58a76-9718-4340-abde-9126bf89c0fc",
+      "name": "Memory",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Starterr').first().json.chat_id }}",
+        "text": "Принято! Думаю, это всё, что мне нужно знать. Подождите немного, пока я промониторю сеть для поиска ответов! Заваривайте чай и запасайтесь пирожными!",
+        "additionalFields": {
+          "disable_web_page_preview": true
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1392,
+        32
+      ],
+      "id": "3114827e-7f6e-4230-8998-6274c1f9be8c",
+      "name": "Send a text message1",
+      "webhookId": "",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "05edd7d3-53b3-478f-bbb1-077cb9566344",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "ASK_USER",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        0
+      ],
+      "id": "f45a37da-8b20-4e59-b033-1e3e2daebdb8",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "05edd7d3-53b3-478f-bbb1-077cb9566344",
+              "leftValue": "={{ $json.validator_text }}",
+              "rightValue": "ASK_USER",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -592,
+        480
+      ],
+      "id": "fc1a84ba-4255-48ae-bb22-e635707943a5",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "MVP_Clarifier_Stash",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Аркуш1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Chat_ID",
+              "lookupValue": "={{ $json.chat_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -240,
+        576
+      ],
+      "id": "c86401d9-f749-4f11-99bc-b753555f79af",
+      "name": "Found row",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ JSON.stringify($('Starterr').first().json.validator_text) }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Ты — заботливый и экспертный Финансовый Стратег. Твоя задача — изучить отчет от технического Валидатора (массивы Validated и NotValidated) и написать итоговое сообщение клиенту в Telegram.\n\n=== ПРОФИЛЬ КЛИЕНТА ===\nЦель: {{ $json.Goal_Name }}\nДоход: {{ $json.Salary }}\nНакопления: {{ $json.Savings }}\nПоведение: {{ $json.Behavior }}\n\n=== АЛГОРИТМ ФОРМИРОВАНИЯ ОТВЕТА (КРИТИЧЕСКИ ВАЖНО!) ===\nПосчитай количество подходящих вариантов (массив Validated) и построй структуру ответа по одному из трех сценариев:\n\nСЦЕНАРИЙ А: Подходящих вариантов МНОГО (3 и более):\n1. Начни с позитивного введения.\n2. Блок \"🏆 САМЫЙ РЕКОМЕНДУЕМЫЙ ВАРИАНТ\": Выбери ровно 1 лучший вариант из Validated. Сопоставь его с профилем клиента и объясни, ПОЧЕМУ именно он идеален для данного бюджета.\n3. Блок \"✅ ОСТАЛЬНЫЕ НАХОДКИ\": Перечисли оставшиеся варианты из Validated. Кратко поясни, почему их тоже можно рассмотреть. \n(Отбракованные лоты в этом сценарии НЕ показывай, чтобы не перегружать клиента).\n\nСЦЕНАРИЙ Б: Подходящих вариантов МАЛО (1 или 2):\n1. Точно так же выдели \"🏆 САМЫЙ РЕКОМЕНДУЕМЫЙ ВАРИАНТ\" и (если есть еще один) \"✅ АЛЬТЕРНАТИВУ\".\n2. ОБЯЗАТЕЛЬНО добавь блок \"❌ ЧТО МЫ ПРОВЕРИЛИ И ОТБРАКОВАЛИ\". Объясни клиенту заботливым языком: \"Я проанализировал много рынка, но большинство вариантов пришлось отсеять ради вашей финансовой безопасности\". Выведи варианты из NotValidated и укажи причины отказа.\n\nСЦЕНАРИЙ В: Подходящих вариантов НЕТ ВООБЩЕ (Validated пусто):\n1. Включи максимум эмпатии. Мягко сообщи, что при текущем бюджете цель слишком опасна.\n2. Выведи лоты из NotValidated. Используя причины Валидатора и поведенческий профиль клиента, наглядно объясни, от какой финансовой ямы ты его прямо сейчас уберег (например: \"ежемесячный платеж съел бы 80% вашей зарплаты\").\n\n=== ОФОРМЛЕНИЕ ===\n- Пиши живо, обращайся на \"вы\". \n- Обязательно используй Markdown (жирный текст) и списки для цен/ссылок лотов.\n- В самом конце задай правильный вопрос (например, \"Готовы подкопить или посмотрим цель скромнее?\").\n- Пиши СРАЗУ текст сообщения. Никаких технических размышлений и тегов до или после."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        0,
+        576
+      ],
+      "id": "194e2df5-e165-42fc-9536-f9e27c48234c",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Starterr').first().json.chat_id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        528,
+        576
+      ],
+      "id": "72067b7a-173f-4498-9eda-34fc7ab6a567",
+      "name": "Send a text message2",
+      "webhookId": "",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "WJcqZis7RNzIa4lx",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/WJcqZis7RNzIa4lx",
+          "cachedResultName": "Researcher"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "task_json": "={{ JSON.stringify($('PrettyData').item.json.Researcher_JSON) }}",
+            "chat_id": "={{ $json.chat_id }}"
+          },
+          "matchingColumns": [
+            "task_json"
+          ],
+          "schema": [
+            {
+              "id": "task_json",
+              "displayName": "task_json",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": true,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1776,
+        32
+      ],
+      "id": "d9fc7fbf-5d20-41b1-8258-365b6feba7a6",
+      "name": "Call 'Researcher'"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"chat_id\": \"{{ $('Starterr').first().json.chat_id }}\"\n}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1584,
+        32
+      ],
+      "id": "9e9700e6-5a0c-4f03-a648-39b0e0d1fd0f",
+      "name": "ChadID_Payload"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "==== ДАННЫЕ КЛИЕНТА ===\nЦель: {{ $json.Goal_Name }}\nТип цели: {{ $json.Goal_Type }}\nЗарплата: {{ $json.Salary }}\nОбщие траты: {{ $json.Expenses_Total }}\nНакопления: {{ $json.Savings }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=<SYSTEM_ROLE>\nТы — старший финансовый аналитик. Твоя задача: на основе данных клиента принять решение о следующем шаге и строго вернуть JSON-объект.\n</SYSTEM_ROLE>\n\n<DECISION_LOGIC>\n1. КОНКРЕТНАЯ ЦЕЛЬ (Tesla Cybertruck, iPhone, путевка, ремонт и т.д.): \nУстанови NEXT_ACTION \"CALL_RESEARCHER\". ТЫ — ЭКСПЕРТ. САМ сгенерируй JSON для исследователя (Researcher_JSON), сам придумай подходящие маркетплейсы/сайты для поиска (например, автосайты для машин). Не задавай вопросов!\n\n2. АБСТРАКТНАЯ ЦЕЛЬ (\"просто машина\", \"ноутбук\") БЕЗ ЦИФР/СУММЫ: \nУстанови NEXT_ACTION \"ASK_USER\". Сгенерируй короткий вопрос про бюджет. Researcher_JSON оставь пустым (\"empty\").\n</DECISION_LOGIC>\n\n<OUTPUT_FORMAT>\nВерни СТРОГО один валидный JSON такой структуры, БЕЗ markdown (без ```json):\n{\n  \"NEXT_ACTION\": \"CALL_RESEARCHER или ASK_USER\",\n  \"Question_Text\": \"Твой вопрос или пустая строка\",\n  \"Researcher_JSON\": {\n    \"request_type\": \"market_research\",\n    \"target_items\": [\"что искать\"],\n    \"marketplaces\": [\"где искать\"],\n    \"constraints\": {\"budget\": \"лимиты или неизвестно\"}\n  } \n  // если ASK_USER, то \"Researcher_JSON\": \"empty\"\n}\n</OUTPUT_FORMAT>"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        560,
+        -16
+      ],
+      "id": "72121733-34e6-4bf1-9d21-4080ad44a75b",
+      "name": "SearchDataBake"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawText = $input.first().json.text;\n\nreturn [\n  {\n    json: JSON.parse(rawText)\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        -16
+      ],
+      "id": "a8449f83-67c8-4335-bf46-d19db6395047",
+      "name": "PrettyData"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "gemini-3-flash-preview"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "frequencyPenalty": 1.5,
+          "maxTokens": 2000,
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        272
+      ],
+      "id": "ecb527f3-5123-456b-8c8d-c227b2cef001",
+      "name": "OpenAI Chat Model3",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "gemini-3-flash-preview"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "frequencyPenalty": 1.5,
+          "maxTokens": 2000,
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        512,
+        208
+      ],
+      "id": "2419a0c5-d4c3-469c-844e-ef5d70f56e13",
+      "name": "OpenAI Chat Model",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "gemini-3-flash-preview"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "frequencyPenalty": 1.5,
+          "maxTokens": 2000,
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -48,
+        784
+      ],
+      "id": "b539e27a-d95f-4466-9875-aa8db378c5ae",
+      "name": "OpenAI Chat Model1",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "jsCode": "let finalMsg = $input.first().json.text;\n\n \nfinalMsg = finalMsg.replace(/(?<!\\*)\\*(?!\\*)/g, '-');\n\nfinalMsg = finalMsg.replace(/#/g, '');\n\nreturn [{\n  json: {\n    text: finalMsg\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        576
+      ],
+      "id": "f9151294-3089-46ee-a65a-c4952a9de52a",
+      "name": "Code in JavaScript1"
+    }
+  ],
+  "connections": {
+    "Starterr": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Memory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "main": [
+        [
+          {
+            "node": "SearchDataBake",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message1": {
+      "main": [
+        [
+          {
+            "node": "ChadID_Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "SearchDataBake",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Found row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Found row": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ChadID_Payload": {
+      "main": [
+        [
+          {
+            "node": "Call 'Researcher'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SearchDataBake": {
+      "main": [
+        [
+          {
+            "node": "PrettyData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PrettyData": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "SearchDataBake",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateId": "self-building-ai-agent",
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  }
+}

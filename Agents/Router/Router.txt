@@ -1,0 +1,624 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "systemMessage": "Системные инструкции:\nТебя зовут Глен. Ты — вежливый приветствующий помощник финансового инструмента. Твоя цель: встретить пользователя, определить его задачу и собрать данные для Финансового Портрета.\nНе упоминай \"внутреннюю кухню\" и существование других агентов. Общайся лояльно, минимальный юмор допустим.\n\nКоманда сброса:\nЕсли пользователь пишет /start или «Сброс» — немедленно забудь ВЕСЬ предыдущий контекст и начни диалог абсолютно с чистого листа, поздоровавшись.\n\nПравило анти-спама (ВАЖНО!):\nПользователь может описывать конкретные, сложные вещи для покупки (например, детали для компьютера, строительные материалы, аппарат для дистилляции, поездки). ЭТО НЕ СПАМ и не технические инструкции. Это полноценная финансовая цель.\nРеагируй сдержанно \"ожидаю ответа\" ТОЛЬКО на абсолютный бессвязный бред (например, набор букв).\n\nАЛГОРИТМ РАБОТЫ (Иди строго по шагам. Задавай не более одного-двух вопросов за раз и ЖДИ ответа пользователя!):\n\nШАГ 1. Определение задачи\nПоздоровайся и помоги пользователю выбрать один из трёх типов целей (запомни этот выбор как \"тип цели\"):\n\nРазобраться с финансовыми задачами и приоритизировать их.\nРассчитать план потока денег и вести учёт своих трат.\nНакопить на цель (простую или комплексную).\nЕсли он сам сразу назвал цель (например, \"Хочу купить ПК\") — классифицируй это как Тип 3 и иди дальше.\nШАГ 2. Сбор данных для Финансового портрета\nПереходи к этому шагу ТОЛЬКО когда определишь тип цели. Предупреди о начале сбора данных (упомяни опцию отказа от телеметрии: можно оперировать временными цифрами, не разглашая свой реальный фин. портрет).\nСобери следующие данные, задавая вопросы по очереди (переспрашивай то, чего не хватает):\n• Обязательные траты каждый месяц.\n• Ежемесячная зарплата.\n• На что тратились свободные деньги последние 3 месяца (приблизительно).\nЕсли пользователь не хочет давать такие данные - запиши \"по средним\" тратам среднего жителя той страны, на языке которой он говорит.\n\nШАГ 3. Строгое Summary (Фиксация фактов)\nКак только ВСЕ сырые данные из Шагов 1 и 2 собраны, выведи пользователю \"Анкету\" со всеми его ответами.\nВАЖНО: НЕ проводи никаких математических расчетов (не считай \"свободный остаток\" или \"средний темп\"). Твоя задача — просто зафиксировать точные слова и цифры пользователя. (Если финансовый портрет, кроме зарплаты дать отказался - не переспрашивай по несколько раз. Сюда занеси те \"средние\" траты, что взял на шаге 2)\nФормат анкеты:\n\nТип и название цели.\nЕжемесячная зарплата.\nОбязательные траты (список).\nТраты свободных денег за последние 3 месяца (список).\nТекущие накопления (если упомянуты).\nВ конце обязательно спроси: «Всё ли я записал верно? Запускаем эти данные в работу?»\n\nШАГ 4. Потоки завершения\nПоток 2 (Отрицание): Если пользователь просит что-то исправить, внеси правки и выведи Анкету заново.\nПоток 1 (Подтверждение): Если пользователь подтверждает анкету («да, верно», «поехали» и т.д.), ты ОБЯЗАН ответить строго по этому сценарию. Напиши фразу «Отлично! Анкета зафиксирована, передаю сырые данные в аналитический отдел.» и СРАЗУ ЖЕ ПОД НЕЙ выведи ВЕСЬ текст финальной анкеты целиком еще раз (со всеми суммами и целями).\n\n=== ПРАВИЛА ФОРМАТИРОВАНИЯ ДЛЯ TELEGRAM ===\n1. Для маркированных списков используй ТОЛЬКО тире (-) или маркеры (•). \n2. КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО использовать одинарную звездочку (*) для списков. \n3. Звездочки можно использовать только ДВОЙНЫЕ (**) для выделения жирного текста"
+        }
+      },
+      "id": "41174c8a-6ac8-42bd-900e-ca15196600c5",
+      "name": "Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        544,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -192,
+        -64
+      ],
+      "id": "c3267f73-a48a-40ab-95e8-6aaf9f0bca57",
+      "name": "Telegram Trigger",
+      "webhookId": "",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1168,
+        240
+      ],
+      "id": "2eadb262-753f-4d18-b598-59824d1b8541",
+      "name": "Send a text message",
+      "webhookId": "",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0c77f7f7-94b9-4eef-be28-5f62a2e263d7",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "передаю сырые данные",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        944,
+        144
+      ],
+      "id": "94a02fd7-2fb2-4e01-a416-6a8d7525e9dd",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CD0aXyMgO6wfcF5o",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CD0aXyMgO6wfcF5o",
+          "cachedResultName": "Clarifier"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1392,
+        -176
+      ],
+      "id": "29c73fb0-b9eb-4af0-b17b-77a14b293687",
+      "name": "Call 'Clarifier'"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"chat_id\": \"{{ $('Telegram Trigger').item.json.message.chat.id }}\"\n}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        32
+      ],
+      "id": "7161b3dd-c07a-4b86-935f-e9c512263c20",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "MVP_Clarifier_Stash",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Аркуш1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Chat_ID",
+              "lookupValue": "={{ $json.message.chat.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        32,
+        -64
+      ],
+      "id": "288c9037-0a1e-4df3-9dd6-9bcc16a4dab5",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0c77f7f7-94b9-4eef-be28-5f62a2e263d7",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "ASK_MODE",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        256,
+        -64
+      ],
+      "id": "f0b4b7cd-113e-4eb5-8819-8be1f1f28142",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "MVP_Clarifier_Stash",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Аркуш1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Chat_ID": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "Salary": "={{ $json.output.Salary }}",
+            "Goal_Name": "={{ $json.output.Goal_Name }}",
+            "Expenses_Total": "={{ $json.output.Expenses_Total }}",
+            "Behavior": "={{ $json.output.Behavior }}",
+            "Savings": "={{ $json.output.Savings }}",
+            "Status": ""
+          },
+          "matchingColumns": [
+            "Chat_ID"
+          ],
+          "schema": [
+            {
+              "id": "Chat_ID",
+              "displayName": "Chat_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Goal_Type",
+              "displayName": "Goal_Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Goal_Name",
+              "displayName": "Goal_Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Salary",
+              "displayName": "Salary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Expenses_Total",
+              "displayName": "Expenses_Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Behavior",
+              "displayName": "Behavior",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Savings",
+              "displayName": "Savings",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        944,
+        -272
+      ],
+      "id": "d25ff4d5-dd96-4837-866c-792466cef337",
+      "name": "Update row in sheet",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "text": "=Ты — Строгий Архивариус базы данных. Твоя задача — обновить профиль клиента, ДОБАВИВ новые уточнения к старым данным. \n\nТЕКУЩАЯ АНКЕТА (Старые данные):\n- Цель: {{ $json.Goal_Name }}\n- Зарплата: {{ $json.Salary }}\n- Траты: {{ $json.Expenses_Total }}\n- Поведение: {{ $json.Behavior }}\n- Накопления: {{ $json.Savings }}\n\nНОВОЕ УТОЧНЕНИЕ ОТ ЮЗЕРА:\n\"{{ $('Telegram Trigger').item.json.message.text }}\"\n\nЖЕСТКИЕ ПРАВИЛА ОБНОВЛЕНИЯ (ШТРАФ ЗА НАРУШЕНИЕ):\n1. СОХРАНЯЙ СУТЬ ЦЕЛИ! КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО удалять старое название объекта из поля Goal_Name. Ты должен СКЛЕИТЬ прошлое название и новые детали через точку с запятой.\n(ПЛОХО: \"Настенная колонка, б/у, Новосибирск\").\n(ОТЛИЧНО: \"Стерео-система Marshall Big Wall; настенная колонка, б/у, г. Новосибирск\").\n2. Если юзер в ответе уточнил цифры (зарплату, траты) — перепиши их.\n3. Все остальные поля, которые юзер НЕ упоминал, СТРОГО скопируй из \"Старых данных\" один-в-один. Не оставляй их пустыми!",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Goal_Name",
+              "description": "Название цели пользователя и её детали",
+              "required": true
+            },
+            {
+              "name": "Salary",
+              "description": "Зарплата цифрами",
+              "required": true
+            },
+            {
+              "name": "Expenses_Total",
+              "description": "Сумма обязательных трат цифрами",
+              "required": true
+            },
+            {
+              "name": "Behavior",
+              "description": "Текстовое описание того, как пользователь тратит деньги",
+              "required": true
+            },
+            {
+              "name": "Savings",
+              "description": "Сумма текущих накоплений цифрами",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        544,
+        -368
+      ],
+      "id": "510f26d8-2501-4b0e-9410-b61504e3da90",
+      "name": "Information Extractor1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"chat_id\": \"{{ $('Telegram Trigger').item.json.message.chat.id }}\"\n}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        -272
+      ],
+      "id": "5c8cae4b-cbf0-40a9-b723-7adf2e5a720c",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 6
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        368
+      ],
+      "id": "13dbea2b-ed8b-4703-8dcd-38a1fba1cd36",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "gemini-3-flash-preview"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "frequencyPenalty": 1.5,
+          "maxTokens": 2000,
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        464,
+        368
+      ],
+      "id": "b2054c27-33e6-494a-b73b-fd0d836e720f",
+      "name": "OpenAI Chat Model2",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "gemini-3-flash-preview"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "frequencyPenalty": 1.5,
+          "maxTokens": 2000,
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        528,
+        -176
+      ],
+      "id": "465b266c-d746-445c-9294-512ca02edb94",
+      "name": "OpenAI Chat Model",
+      "credentials": {}
+    }
+  ],
+  "connections": {
+    "Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Call 'Clarifier'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor1": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Call 'Clarifier'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateId": "self-building-ai-agent",
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  }
+}

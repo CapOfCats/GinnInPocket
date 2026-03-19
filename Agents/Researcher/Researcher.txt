@@ -1,0 +1,263 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "pc_research_test",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -288,
+        128
+      ],
+      "id": "2c811353-41ed-436f-af85-ac8b715a55b0",
+      "name": "Simple Memory",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=ВВОДНЫЕ ДАННЫЕ ДЛЯ ПОИСКА:\n{{ $('FromClarifier').item.json.task_json }}\n\nТВОЯ РОЛЬ:\nТы — скоростной Data-Scraper (сыщик). Твоя единственная задача — пойти в интернет, найти реальные цены/условия на запрошенный целевой объект (товар, услугу, недвижимость и т.д.) и принести \"сырые\" результаты. ТЫ НЕ ПРИНИМАЕШЬ РЕШЕНИЙ о том, подходит ли это клиенту.\n\nСТРАТЕГИЯ ПОИСКА И ОГРАНИЧЕНИЯ (КРИТИЧЕСКИ ВАЖНО!):\n1. Сделай МАКСИМУМ 2 поисковых запроса в Tavily. Не уходи в бесконечный цикл поиска!\n2. Твоя цель — собрать 5-7 отдельных карточек (вариантов) для JSON.\n3. ВАЖНОЕ ПРАВИЛО РАСПАКОВКИ: Если в результатах поиска (например, на маркетплейсе, агрегаторе объявлений или сайте магазина) ты видишь упоминание нескольких разных предложений одной тематики — РАЗБИВАЙ ИХ на отдельные элементы массива \"found_items\". Не пиши \"разброс цен\" в одной карточке! Сделай из этого списка отдельные карточки с конкретной ценой под каждый лот/модель/тариф, даже если у них всех будет одинаковый URL.\n4. Если ты сделал 2 полных поиска и смог \"выцепить\" из текста только 4 или 5 конкретных вариантов — останавливайся и отдавай их. БОЛЬШЕ 2 ПРЫЖКОВ В ПОИСКОВИК ЗАПРЕЩЕНО.\n\nФОРМАТ ОТВЕТА (СТРОГИЙ JSON):\nКАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО писать обычный текст, маркдаун-теги (```json), здороваться или давать комментарии. Верни СТРОГО один валидный объект по этому шаблону:\n\n{\n  \"market_summary\": \"Краткая выжимка рынка (например: средний диапазон цен, доступность в нужном регионе, наличие дефицита или сложности с логистикой/исполнением)\",\n  \"found_items\": [\n    {\n      \"name\": \"Точное название / Модель / Комплектация / Тариф\",\n      \"price\": \"Обнаруженная цена (число + валюта)\",\n      \"url\": \"Ссылка на источник\",\n      \"details\": \"Технические нюансы, состояние, сроки доставки/исполнения, налоги или скрытые комиссии\"\n    }\n  ]\n}",
+        "options": {
+          "maxIterations": 5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -384,
+        -80
+      ],
+      "id": "de4377b6-a8d5-4f31-9408-fcbdf2bb99dd",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "task_json"
+            },
+            {
+              "name": "chat_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -640,
+        -80
+      ],
+      "id": "cfc13ba8-dbf0-404f-a966-d88e02f618ed",
+      "name": "FromClarifier"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Используй этот инструмент для поиска актуальных рыночных цен в интернете. Ищи предложения по любым целям: физическим товарам на маркетплейсах/досках объявлений, туристическим путевкам, билетам, стоимости услуг и образовательным курсам. Цель инструмента — собрать реальные цены и ссылки для оценки бюджета клиента.",
+        "query": "={{ $fromAI('query', 'Текст запроса для поиска товаров, цен и магазинов', 'string') }}",
+        "options": {
+          "search_depth": "basic",
+          "max_results": 5,
+          "include_answer": "advanced"
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        128
+      ],
+      "id": "916a0eb0-72ec-4909-a4ed-5a327a787b95",
+      "name": "Search in Tavily",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"chat_id\": \"{{ $('FromClarifier').first().json.chat_id }}\"\n}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        192,
+        -288
+      ],
+      "id": "c06ed441-d6ee-4256-a260-048ca531cec1",
+      "name": "ChadID_Payload"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.output;\n\nif (!raw) {\n  throw new Error(\"AI Agent did not return output\");\n}\n\nlet parsed;\n\ntry {\n  if (typeof raw === \"string\") {\n    const start = raw.indexOf(\"{\");\n    const end = raw.lastIndexOf(\"}\");\n\n    if (start === -1 || end === -1) {\n      throw new Error(\"No JSON object found in output\");\n    }\n\n    const jsonString = raw.slice(start, end + 1);\n    parsed = JSON.parse(jsonString);\n  } else {\n    parsed = raw;\n  }\n} catch (error) {\n  throw new Error(\"Failed to parse AI Agent output as JSON: \" + error.message);\n}\n\nreturn [\n  {\n    json: parsed\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        -80
+      ],
+      "id": "6e9cadd0-fc9b-493a-8a2c-b72bb3877671",
+      "name": "PrettyData"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "0iUPcDdrMAmf05O2",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/0iUPcDdrMAmf05O2",
+          "cachedResultName": "Validator"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('FromClarifier').first().json.chat_id }}",
+            "data_json": "={{ JSON.stringify($json) }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "data_json",
+              "displayName": "data_json",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": true,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        -80
+      ],
+      "id": "7302dc7e-8121-4ead-9134-df93d3527ab9",
+      "name": "Call 'Validator'"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gemini-3-pro-preview",
+          "mode": "list",
+          "cachedResultName": "gemini-3-pro-preview"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "frequencyPenalty": 1.5,
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -416,
+        144
+      ],
+      "id": "e4e6c441-0e52-4366-812e-2236d232203c",
+      "name": "OpenAI Chat Model1",
+      "credentials": {}
+    }
+  ],
+  "connections": {
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "PrettyData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FromClarifier": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search in Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ChadID_Payload": {
+      "main": [
+        []
+      ]
+    },
+    "PrettyData": {
+      "main": [
+        [
+          {
+            "node": "Call 'Validator'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  }
+}

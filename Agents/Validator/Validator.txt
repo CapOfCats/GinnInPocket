@@ -1,0 +1,246 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "data_json"
+            },
+            {
+              "name": "chat_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2016,
+        96
+      ],
+      "id": "24a6369e-21f0-48a9-aa26-5a8e55d1f819",
+      "name": "FromResearcher"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "MVP_Clarifier_Stash",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Аркуш1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Chat_ID",
+              "lookupValue": "={{ $json.chat_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1792,
+        96
+      ],
+      "id": "f3c91950-4b26-449f-8d02-0d6cde79ac24",
+      "name": "Memory",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "==== ДАННЫЕ ПРОФИЛЯ КЛИЕНТА ===\nЗарплата: {{ $('Memory').item.json.Salary }}\nНакопления: {{ $('Memory').item.json.Savings }}\nНазвание изначальной цели: {{ $('Memory').item.json.Goal_Name }}\n\n=== НАЙДЕННЫЕ ВАРИАНТЫ (КАРТОЧКИ) ===\n{{ JSON.stringify($('FromResearcher').item.json.task_json) }}\n\n=== ТВОЯ ЗАДАЧА ===\nТвоя роль — строгий и логичный Валидатор. Ты должен прогнать КАЖДУЮ карточку из найденных вариантов через два фильтра:\n\n1. ВНУТРЕННИЙ ФИЛЬТР (Адекватность товара): Относятся ли данные к одному товару? Реалистична ли цена? (Если машина стоит $500 — это отбраковка, скорее всего это запчасть).\n2. ВНЕШНИЙ ФИЛЬТР (Финансовая реальность): Сопоставь цену лота с доходами и накоплениями профиля. Если покупка этого лота уничтожит бюджет клиента или математически невозможна даже при кредите — смело бракуй.\n\n=== ПРАВИЛА ОБРАБОТКИ (КРИТИЧЕСКИ ВАЖНО!) ===\n1. КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО объединять, сжимать или обобщать данные! \n2. Ты должен обработать КАЖДЫЙ элемент из массива \"found_items\", который прислал Ресерчер, как отдельную независимую единицу.\n3. Сколько карточек пришло на вход — РОВНО СТОЛЬКО ЖЕ карточек должно оказаться в сумме в массивах Validated и NotValidated на выходе.\n4. Обязательно сохраняй оригинальные поля \"name\", \"price\" и \"url\" для каждой машины. Запрещено писать \"N/A\" в ссылках или диапазоны цен, если на входе были точные данные.\n5. Если все 5 машин не подходят по бюджету — напиши 5 отдельных объектов внутри массива NotValidated, даже если причина отказа будет похожей.\n\n=== ФОРМАТ ОТВЕТА ===\nВерни строго один JSON, разбив все карточки на два массива. Добавь в каждую карточку поля \"decision\" и \"reason\".\n\n{\n  \"Validated\": [\n    {\n      \"name\": \"Название из лота\",\n      \"price\": \"Цена\",\n      \"url\": \"Ссылка\",\n      \"decision\": \"Validated\",\n      \"reason\": \"\" // Оставь пустым\n    }\n  ],\n  \"NotValidated\": [\n    {\n      \"name\": \"Название из лота\",\n      \"price\": \"Цена\",\n      \"url\": \"Ссылка\",\n      \"decision\": \"Отбракован\",\n      \"reason\": \"Подробно объясни клиенту, почему: например, несостыковка цены и дохода, или подозрение на фейк\"\n    }\n  ]\n}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -1584,
+        96
+      ],
+      "id": "2feeffce-81d9-4b8b-8fda-30f1a87d9737",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "gemini-3-flash-preview"
+        },
+        "builtInTools": {},
+        "options": {
+          "frequencyPenalty": 1.5,
+          "maxTokens": 2000,
+          "textFormat": {
+            "textOptions": {
+              "type": "json_object"
+            }
+          },
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -1584,
+        288
+      ],
+      "id": "c79858e7-52dd-4013-99fd-8de005f6c240",
+      "name": "OpenAI Chat Model2",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "jsCode": "\nlet parsedData = JSON.parse($input.first().json.text);\n\nif (Array.isArray(parsedData)) {\n  parsedData = parsedData[0];\n}\n\nreturn [{ \n  json: { \n    validator_text: parsedData \n  } \n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1280,
+        96
+      ],
+      "id": "b95db3b4-d434-4d0a-82ca-7293324c298c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8fb13a77-3236-4ce8-969d-b17f9a88ea28",
+              "name": "=chat_id",
+              "value": "={{ $('FromResearcher').first().json.chat_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1056,
+        96
+      ],
+      "id": "8ee2d28f-3830-4eb1-bce4-ef9d89fdaf7e",
+      "name": "ChadID_Payload"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CD0aXyMgO6wfcF5o",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CD0aXyMgO6wfcF5o",
+          "cachedResultName": "Clarifier"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -800,
+        96
+      ],
+      "id": "b761c737-a739-4a63-b37f-f9cfae6a59a3",
+      "name": "Call 'Clarifier'"
+    }
+  ],
+  "connections": {
+    "FromResearcher": {
+      "main": [
+        [
+          {
+            "node": "Memory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "ChadID_Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ChadID_Payload": {
+      "main": [
+        [
+          {
+            "node": "Call 'Clarifier'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  }
+}
